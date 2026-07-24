@@ -150,49 +150,78 @@ source .venv/bin/activate
 ```bash
 pip install -r requirements.txt
 ```
+## 5. Install Additional Packages
 
-### Install Faker
+If these packages are not already included in `requirements.txt`, install them manually.
 
-```bash
-pip install faker pandas numpy
-```
-
-### Start PostgreSQL
+### Faker
 
 ```bash
-docker compose up -d
+pip install faker
 ```
 
-### Generate synthetic data
+### Streamlit
 
 ```bash
-python src/data_generation/generate_pipeline_data.py
+pip install streamlit
 ```
+## 6. Configure Environment Variables
 
-### Run the ETL pipeline
+Create a `.env` file in the project root and add your PostgreSQL credentials.
+
+```env
+DB_USER=postgres
+DB_PASSWORD=your_password
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=pipeguard_ai
+
+RAW_DATA_PATH=data/raw/kpc_pipeline_sensor_data.csv
+PROCESSED_DATA_PATH=data/processed/clean_pipeline_data.csv
+```
+## 7. Run the ETL Pipeline
+
+Run the complete ETL workflow:
 
 ```bash
-python src/main.py
+python -m src.main
 ```
 
-### Run tests
+The pipeline will:
 
-```bash
-pytest
-```
+- Generate synthetic pipeline sensor data
+- Extract the raw dataset
+- Clean and transform the data
+- Validate data quality
+- Calculate product loss
+- Load the processed data into PostgreSQL
 
 ---
 
-## Expected Outputs
+## 8. Launch the Dashboard
 
-Running the pipeline will generate:
+Start the Streamlit dashboard:
 
-- Cleaned pipeline dataset
-- Data quality validation report
-- Product loss calculations
-- PostgreSQL database records
+```bash
+streamlit run dashboard/app.py
+```
 
----
+After the server starts, open your browser and visit:
+
+```
+http://localhost:8501
+```
+
+The dashboard provides:
+
+- Pipeline Health Score
+- Flow In vs Flow Out Monitoring
+- Product Loss Trends
+- Operational Anomaly Detection
+- Pipeline Segment Performance
+- Highest Product Loss Events
+- Interactive Filters
+
 
 ## Team
 
