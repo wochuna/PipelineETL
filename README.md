@@ -49,7 +49,7 @@ Build a production-ready data pipeline that:
 
 ```text
 PipeGuard-AI/
-├── dashboard
+├── dashboard/
 │
 ├── data/
 │   ├── raw/
