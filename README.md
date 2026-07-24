@@ -42,16 +42,14 @@ Build a production-ready data pipeline that:
 - Data quality validation
 - Product loss calculation
 - PostgreSQL data storage
-- Docker support
 - GitHub Actions Continuous Integration
-- Unit testing with Pytest
 
----
 
 ## Project Structure
 
 ```text
 PipeGuard-AI/
+├── dashboard
 │
 ├── data/
 │   ├── raw/
@@ -61,6 +59,8 @@ PipeGuard-AI/
 │
 ├── src/
 │   ├── data_generation/
+│   ├── analytics/
+│   ├── config/
 │   ├── ingestion/
 │   ├── transformation/
 │   ├── validation/
@@ -69,17 +69,18 @@ PipeGuard-AI/
 │
 ├── tests/
 │
+├── .env
+├── .gitignore
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
 └── README.md
 ```
 
----
 
 ## ETL Workflow
 
-```text
+```
 Raw Pipeline Data
         │
         ▼
@@ -98,7 +99,6 @@ Calculate Product Loss
 Load into PostgreSQL
 ```
 
----
 
 ## Technology Stack
 
@@ -109,12 +109,9 @@ Load into PostgreSQL
 | Synthetic Data   | Faker          |
 | Database         | PostgreSQL     |
 | ORM              | SQLAlchemy     |
-| Validation       | Pandera        |
-| Testing          | Pytest         |
-| Containerization | Docker         |
+| Visualization    | Streamlit      |
 | CI               | GitHub Actions |
 
----
 
 ## Getting Started
 
@@ -233,7 +230,6 @@ AVENGERS GROUP
 - Macharia Kariuki
 - Yvonne Wochuna
 
----
 
 ## License
 
