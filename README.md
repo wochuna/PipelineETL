@@ -118,7 +118,7 @@ Load into PostgreSQL
 ### Clone the repository
 
 ```bash
-git clone https://github.com/E-Macharia/pipeguard-ai.git
+git clone https://github.com/wochuna/pipeguard-ai.git
 cd PipeGuard-AI
 ```
 
