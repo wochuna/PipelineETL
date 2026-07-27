@@ -482,32 +482,52 @@ pressure_chart.update_layout(
 st.plotly_chart(pressure_chart, use_container_width=True)
 
 # ==========================================================
-# Product Loss Trend
+# Product Loss Trend (Daily)
 # ==========================================================
 
-loss_df = (
-    df.groupby("timestamp")["loss_litres"]
+st.subheader("📈 Daily Product Loss Trend")
+
+# Aggregate product loss by day
+daily_loss = (
+    df
+    .set_index("timestamp")
+    .resample("D")["loss_litres"]
     .sum()
     .reset_index()
 )
 
-loss_chart = px.area(
-    loss_df,
+fig = px.line(
+    daily_loss,
     x="timestamp",
     y="loss_litres",
-    title="Product Loss Trend",
+    title="Daily Product Loss",
+    markers=True
+)
+
+# Styling
+fig.update_traces(
+    line=dict(color="#FF6B00", width=4),
+    marker=dict(
+        size=8,
+        color="#FFD700",
+        line=dict(color="#FFFFFF", width=1)
+    )
+)
+
+fig.update_layout(
     template="plotly_dark",
-    color_discrete_sequence=["#FF3D00"]
+    plot_bgcolor="#08111F",
+    paper_bgcolor="#08111F",
+    font=dict(color="white", size=14),
+    title_font=dict(size=22),
+    xaxis_title="Date",
+    yaxis_title="Product Loss (Litres)",
+    hovermode="x unified",
+    height=500
 )
 
-loss_chart.update_layout(
-    height=420,
-    paper_bgcolor="#08111f",
-    plot_bgcolor="#08111f",
-    font=dict(color="white")
-)
+st.plotly_chart(fig, use_container_width=True)
 
-st.plotly_chart(loss_chart, use_container_width=True)
 
 # ==========================================================
 # Product Loss by Station
@@ -629,10 +649,7 @@ else:
 
     st.success("No anomalies detected.")
 
-
-
-
-    # ==========================================================
+# ==========================================================
 # PIPELINE NETWORK HEALTH
 # ==========================================================
 
@@ -648,6 +665,12 @@ segment_summary = (
     )
     .reset_index()
 )
+
+# Sort by alerts first, then average loss (highest first)
+segment_summary = segment_summary.sort_values(
+    by=["alerts", "avg_loss"],
+    ascending=[False, False]
+).reset_index(drop=True)
 
 network_cols = st.columns(len(segment_summary))
 
@@ -687,19 +710,17 @@ for i, row in segment_summary.iterrows():
 
             <h3>{icon}</h3>
 
-            <h3>{row.pipeline_segment}</h3>
+            <h2>{row.pipeline_segment}</h2>
 
-            <p>{status}</p>
+            <p><b>{status}</b></p>
 
             <hr>
 
             Avg Loss<br>
-            <b>{row.avg_loss:.1f} L</b>
-
-            <br><br>
+            <h3>{row.avg_loss:.1f} L</h3>
 
             Alerts<br>
-            <b>{int(row.alerts)}</b>
+            <h3>{int(row.alerts)}</h3>
 
             </div>
             """,
@@ -736,6 +757,70 @@ st.dataframe(
     ],
     use_container_width=True,
     height=400
+)
+
+# ==========================================================
+# Shrinkage by Anomaly Type
+# ==========================================================
+
+st.markdown("---")
+st.subheader("🚨 Product Shrinkage by Anomaly Type")
+
+# Keep only anomaly records
+anomaly_df = df[df["anomaly"] == True]
+
+# Total loss by anomaly type
+loss_by_anomaly = (
+    anomaly_df
+    .groupby("anomaly_type")["loss_litres"]
+    .sum()
+    .reset_index()
+    .sort_values("loss_litres", ascending=False)
+)
+
+fig = px.bar(
+    loss_by_anomaly,
+    x="anomaly_type",
+    y="loss_litres",
+    text="loss_litres",
+    color="anomaly_type",
+    title="Total Product Shrinkage by Operational Anomaly",
+    template="plotly_dark",
+    color_discrete_map={
+        "Illegal Tapping": "#FF1744",
+        "Pipeline Leak": "#FFD600",
+        "Pressure Drop": "#00E5FF"
+    }
+)
+
+fig.update_traces(
+    texttemplate="%{text:,.0f} L",
+    textposition="outside"
+)
+
+fig.update_layout(
+    paper_bgcolor="#08111F",
+    plot_bgcolor="#08111F",
+    font=dict(color="white"),
+    xaxis_title="Operational Anomaly",
+    yaxis_title="Total Product Loss (Litres)",
+    showlegend=False,
+    height=550
+)
+
+st.plotly_chart(fig, use_container_width=True)
+
+highest = loss_by_anomaly.iloc[0]
+lowest = loss_by_anomaly.iloc[-1]
+
+st.success(
+    f"🔴 Highest shrinkage: **{highest['anomaly_type']}** "
+    f"({highest['loss_litres']:,.0f} Litres)"
+)
+
+st.info(
+    f"🟢 Lowest shrinkage: **{lowest['anomaly_type']}** "
+    f"({lowest['loss_litres']:,.0f} Litres)"
 )
 
 # ==========================================================
