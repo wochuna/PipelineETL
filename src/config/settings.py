@@ -14,5 +14,9 @@ DATABASE_URL = (
     f"{DB_HOST}:{DB_PORT}/{DB_NAME}"
 )
 
+if not all([DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME]):
+    raise ValueError("One or more database environment variables are missing.")
+
 RAW_DATA_PATH = os.getenv("RAW_DATA_PATH")
 PROCESSED_DATA_PATH = os.getenv("PROCESSED_DATA_PATH")
+
